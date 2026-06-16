@@ -1,7 +1,7 @@
-from symtable import Class
+
 from typing import Literal
-from click import option
-from pydantic import BaseModel, Field, EmailStr
+
+from pydantic import BaseModel, EmailStr
 
 class login(BaseModel):
     username: str
@@ -29,7 +29,7 @@ class TokenData(BaseModel):
     id: int | None = None
 
 
-class delete (BaseModel):
+class delete(BaseModel):
     username: str
 
 class update_account(BaseModel):

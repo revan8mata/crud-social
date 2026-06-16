@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
-    model_config = SettingsConfigDict(env_file=Path(__file__).parent / ".env")
+    model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()
 

@@ -3,10 +3,10 @@ from alembic.autogenerate.compare import comments
 from fastapi import HTTPException
 from sqlalchemy.testing.pickleable import User
 
-ROUTER = APIRouter(
-    tags=["comments"],
-    prefix="/comments"
-)
+# ROUTER = APIRouter(
+#     tags=["comments"],
+#     prefix="/comments"
+# )
 
 
 
