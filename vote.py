@@ -25,7 +25,7 @@ def vote(vote: schemas.vote,db: Session = Depends(get_db),
                             detail=f"Post {vote.post_id} does not exist")
 
     found_query = db.execute(select(models.vote)
-    .where(models.vote.post_id == vote.post_id,models.vote.user_id == current_user.id)).scalars().first()
+    .where(models.vote.post_id == vote.post_id,models.vote.owner_id == current_user.id)).scalars().first()
 
     if vote.dir == 1:
         if found_query:

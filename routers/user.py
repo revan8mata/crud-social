@@ -27,7 +27,7 @@ async def post(user : schemas.create_account , db: Session = Depends(get_db)):
     return newposta
 
 # route- creation input validation- hash operation-
-# db dependenct and selection via orm  - confirm existance - add to db- commit to db - export
+# db dependency and selection via orm  - confirm existance - add to db- commit to db - export
 
 @ROUTER.get("/user/{id}")
 async def searchbyid(id: int, db: Session = Depends(get_db)):

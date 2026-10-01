@@ -12,6 +12,7 @@ from database import engine
 app = FastAPI()
 
 
+
 origins = ["*"]
 
 

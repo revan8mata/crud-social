@@ -1,4 +1,4 @@
-from enum import unique
+
 from sqlalchemy import DateTime
 from fastapi.openapi.models import Schema
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
@@ -11,7 +11,9 @@ class Post(base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True, nullable=False)
 
-    username = Column(String)
+    username = Column(String)     # mostly acts like a snap shot. when user chenges their username this is no longer useful.
+                                  # we rely on joins with the help of id to identify the owner of the post
+    #                                         (even if they have a deferent username now)
 
     content = Column(String,nullable=False)
 

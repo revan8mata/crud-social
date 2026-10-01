@@ -1,5 +1,5 @@
 from math import acosh
-
+from sqlalchemy import select
 import schemas
 import models
 from fastapi import  FastAPI, Depends, Body, HTTPException, status, Response , APIRouter
@@ -14,33 +14,36 @@ ROUTER = APIRouter(
 )
 # @ROUTER.get("/post/likesall"):
 # acync def get_likes(db: session = depends(get_db)):
-# bullshit=db.query(models.Post).filter(models.Post.user_id == votes.post_id)
-
-@ROUTER.get("/post/all")          #will add a response model
-async def get_posts(id: int ,db: Session = Depends(get_db), current_user : int = Depends(oauth2.get_current_user)):
-    holy = db.query(models.Post).filter(models.Post.user_id==current_user.id).all()
-    return holy
+# query=db.query(models.Post).filter(models.Post.user_id == votes.post_id)
+@ROUTER.get("/post/all",response_model=list[schemas.get_all_posts])
+async def get_posts(db: Session = Depends(get_db), current_user : int = Depends(oauth2.get_current_user)):
+    holy = db.query(models.Post).filter(models.Post.owner_id==current_user.id).all()
+    return holy                            # user can see which posts belong to them
 
 @ROUTER.get("/post/single")
 async def get_posts(post_id : int,db: Session = Depends(get_db), current_user : int = Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(
         models.Post.id == post_id,
-        models.Post.user_id == current_user.id
+        models.Post.owner_id == current_user.id
     ).first()
     return post
 
 
 
-# post = db.execute(select(models.Post).where(models.Post.user_id==current_user.id)).first
+# post = db.execute(select(models.Post).where(models.Post.owner_id==current_user.id)).first
 #     return post
 # )
 
 
 @ROUTER.post("/post", status_code=status.HTTP_201_CREATED )
-async def create_post( post : schemas.post,db: Session = Depends(get_db), current_user : schemas.TokenData = Depends(oauth2.get_current_user) ):
+async def create_post( post : schemas.post,db: Session = Depends(get_db),
+                       current_user : schemas.TokenData = Depends(oauth2.get_current_user) ):
+    user_record = db.execute(select(models.register)
+                             .where(models.register.id==current_user.id)).scalars().first()
     upload = models.Post(
         **post.model_dump(),
-        user_id=current_user.id
+        username= user_record.username,
+        owner_id=current_user.id
     )
     db.add(upload)
     db.commit()
@@ -54,7 +57,7 @@ async def delete(id: int, db: Session = Depends(get_db),current_user : int = Dep
     deletable = holy.first()
     if deletable is None:
         raise HTTPException(status_code=404, detail=f"id of {id} does not exist")
-    if current_user.id != deletable.user_id:
+    if current_user.id != deletable.owner_id:
         raise HTTPException(status_code=403, detail="not authorized to delete this post")
 
     holy.delete(synchronize_session=False)
@@ -66,7 +69,7 @@ async def put(id : int ,user : schemas.post ,db: Session = Depends(get_db),curre
     holy = db.query(models.Post).filter(models.Post.id == id)
     if holy.first() is None:
         raise HTTPException(status_code=404, detail=f"id of {id} does not exist")
-    if current_user.id != holy.first().user_id:
+    if current_user.id != holy.first().owner_id:
         raise HTTPException(status_code=403, detail="not authorized to update this post")
     holy.update({**user.model_dump()}, synchronize_session=False)
     db.commit()

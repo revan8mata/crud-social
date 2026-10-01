@@ -58,3 +58,8 @@ class update_user(BaseModel):
 class comment(BaseModel):
     content: str
     post_id: int
+
+class get_all_posts(BaseModel):
+    username: str
+    id: int
+    content: str
